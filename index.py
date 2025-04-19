@@ -87,6 +87,54 @@ survey_df = survey_raw_df[selected_columns].copy()
 schema = schema_raw[selected_columns] 
 
 """let's view some basic information about the data frame""" 
-print(survey_df.shape)
-print(survey_df.info()) 
-print(schema.shape)
+#print(survey_df.shape)
+#print(survey_df.info()) 
+#print(schema.shape) 
+
+"""Most columns have the data type object, either because they contain values of different 
+types, or they contain empty values, which are represented using NaN. 
+It appears that every column contains empty values, since Non-Null count for every column is lower 
+than the total number of rows (64461). We'll need to deal with empty values and manually adjust the 
+data type of each column on a case-by-case basis. 
+
+Only two columns were detected as numeric (Age and WorkWeekHrs), even though there are a few 
+other columns which have mostly numeric values. To make our analysis easier, let's 
+convert some other columns into numeric data types, while ignoring any non-numeric 
+value (they get converted to NaNs) 
+""" 
+survey_df["Age1stCode"] = pd.to_numeric(survey_df.Age1stCode, errors="coerce") 
+survey_df["YearsCode"] = pd.to_numeric(survey_df.YearsCode, errors="coerce")
+survey_df["YearsCodePro"] = pd.to_numeric(survey_df.YearsCodePro, errors="coerce")  
+
+"""let's view some basic statistics about the numeric columns"""
+#print(survey_df.describe()) 
+
+"""There seems to be a problem with the age column, as the minimum values is 1 and the 
+max value is 279. This a common issue with surveys: responses may contain invalid values due to 
+accidental or intentional erros while responding. A simple fix would be to ignore the rows 
+where the value in the age column is higher than 100 years or lower than 10 years as 
+invalid survey responses. This can be done using the .drop method. 
+""" 
+survey_df.drop(survey_df[survey_df.Age < 10].index, inplace= True)
+survey_df.drop(survey_df[survey_df.Age > 100].index, inplace=True) 
+
+"""
+The same holds true for WorkWeekHrs. Let's ignore entries where the value for 
+the column is higher than 140 hours (~20 hours per day) 
+""" 
+survey_df.drop(survey_df[survey_df.WorkWeekHrs > 140].index, inplace=True) 
+
+""" 
+The gender columns allows picking options, but to simplify our analysis, we'll 
+remove values containing more than one option
+""" 
+print(survey_df["Gender"].value_counts())
+ 
+import numpy as np
+survey_df.where(~(survey_df.Gender.str.contains(";", na=False)), np.nan, inplace=True) 
+
+"""We've now cleaned up and prepared the dataset for analysis. Let's 
+take a look at sample of roaws from the data frame
+"""
+print(survey_df.sample())
+#print(survey_df.describe()) 
