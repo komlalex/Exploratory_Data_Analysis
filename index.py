@@ -36,4 +36,57 @@ schema_raw = pd.read_csv(schema_fname, index_col="Column").QuestionText
 """We can now use schema_raw to retrieve the full question text for any column 
 in surevy_raw_df 
 """
-print(schema_raw["YearsCodePro"])
+#print(schema_raw["YearsCodePro"]) 
+
+"""We've now loaded the dataset, and we're ready to move on to the next step 
+of processing & cleaning the data for our analysis. 
+"""
+
+
+"""Data Preparation &  Cleaning 
+While the survey responses contain a wealth of information, we'll limit our analysis to 
+the following area:
+* Demographics of the survey respondents & the global programming community 
+* Distribution of programming skills, experiences and preferences  
+* Employment-related information, prefeences & opinions
+"""
+selected_columns = [
+    # Demographics
+    "Country", 
+    "Age", 
+    "Gender", 
+    "EdLevel", 
+    "UndergradMajor", 
+    # Programming experience 
+    "Hobbyist",
+    "Age1stCode", 
+    "YearsCode",  
+    "YearsCodePro", 
+    "LanguageWorkedWith", 
+    "LanguageDesireNextYear", 
+    "NEWLearn", 
+    "NEWStuck", 
+    # Employment 
+    "Employment", 
+    "DevType", 
+    "WorkWeekHrs", 
+    "JobSat", 
+    "JobFactors", 
+    "NEWOvertime", 
+    "NEWEdImpt"
+] 
+
+#print(len(selected_columns))  
+
+"""
+Let's extract a copy of the data from these columns into a new data frame survey_df, 
+which we can continue to modify further without further affecting 
+the original data frame.
+""" 
+survey_df = survey_raw_df[selected_columns].copy() 
+schema = schema_raw[selected_columns] 
+
+"""let's view some basic information about the data frame""" 
+print(survey_df.shape)
+print(survey_df.info()) 
+print(schema.shape)
