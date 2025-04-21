@@ -128,7 +128,7 @@ survey_df.drop(survey_df[survey_df.WorkWeekHrs > 140].index, inplace=True)
 The gender columns allows picking options, but to simplify our analysis, we'll 
 remove values containing more than one option
 """ 
-print(survey_df["Gender"].value_counts())
+#print(survey_df["Gender"].value_counts())
  
 import numpy as np
 survey_df.where(~(survey_df.Gender.str.contains(";", na=False)), np.nan, inplace=True) 
@@ -136,5 +136,87 @@ survey_df.where(~(survey_df.Gender.str.contains(";", na=False)), np.nan, inplace
 """We've now cleaned up and prepared the dataset for analysis. Let's 
 take a look at sample of roaws from the data frame
 """
-print(survey_df.sample())
-#print(survey_df.describe()) 
+#print(survey_df.sample(10))
+#print(survey_df.describe())  
+
+"""
+Exploration Analysis and Visualization 
+
+Before we can ask interesting questions about the survey responses, it would help 
+to understand what the deographics i.e. country, age, gender, education level, employment 
+etc of the respondents look at. It's important to explore these variables in order to 
+understand how representative the surveyu is of the worldwide programming community as 
+as survey of this scale generally tends to have selection bias. 
+
+Let's begin by importing matplotlib and seaborn
+""" 
+import matplotlib
+import matplotlib.pyplot as plt 
+import seaborn as sns 
+
+sns.set_style("darkgrid")  
+matplotlib.rcParams["font.size"] = 14 
+matplotlib.rcParams["figure.figsize"] = (9, 5)  
+matplotlib.rcParams["figure.facecolor"] = "#00000000" 
+
+"""Country 
+Let's look at the number of countries from which there are responses in the survey, 
+and plot the 10 countries with the highest number of responses.  
+"""  
+print(schema.Country)
+res = survey_df.Country.nunique()
+
+"""We can identify the countries with the highest number of respondents 
+using the values_counts method.
+"""
+top_countries = survey_df.Country.value_counts().head(15) 
+
+"""We can visualize this information using a bar chart"""
+plt.figure(figsize=(12, 6)) 
+plt.xticks(rotation=75) 
+plt.title(schema.Country) 
+sns.barplot(x=top_countries.index, y=top_countries) 
+
+"""
+It appears that a disproportionately high number of respondents are from USA & India - 
+which one might expect since these countries have the highest populations (Apart from China), 
+and since the Survey is in English, which is the common language used by professionals 
+in US, India and UK.
+""" 
+
+
+"""Age  
+The distribution of the age of respondents is another important factor to look
+at, and we can use a histogram to visualize it.
+"""  
+print(schema)
+plt.figure(figsize=(12, 6)) 
+plt.title(schema.Age) 
+plt.xlabel("Age")
+plt.ylabel("Number of respondents") 
+plt.hist(survey_df.Age, bins=np.arange(10, 80, 5), color="purple") 
+
+"""
+It appears that a large percentage of respondents are in the age range 
+of 20-40, which is somewhat representative of the programming community in 
+general, as a lot of young people have taken up computer as their field of study 
+or profession in the last 20 years. 
+"""
+
+"""Gender 
+Let's look at the Distribution of responses for the Gender. It's a well 
+known fact that women and non-binary genders are underrepresented in the 
+programming community, so we might expect to see a skewed distribution here. 
+""" 
+print(schema.Gender) 
+gender_counts = survey_df.Gender.value_counts(dropna=False) 
+
+"""
+A pie chart would be a good way to visualize the distribution 
+""" 
+plt.figure(figsize=(12, 6)) 
+plt.title(schema.Gender)
+plt.pie(gender_counts, labels=gender_counts.index, autopct="%1.1f%%") 
+
+
+plt.show()
