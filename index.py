@@ -342,10 +342,10 @@ selected each langauge
 languages_worked_percentages = languages_worked_df.mean().sort_values(ascending=False)  
 
 """We can plot this information using a horizontl bar chart""" 
-plt.figure(figsize=(12, 12)) 
+""" plt.figure(figsize=(12, 12)) 
 sns.barplot(x=languages_worked_percentages, y=languages_worked_percentages.index)
 plt.title("Langues used in the past year") 
-plt.xlabel("Count") 
+plt.xlabel("Count")  """
 
 """Perhaps not surprisingly, JavaScript & HTML/CSS comes out on top 
 as web development is one of the most sought skills today and it's also 
@@ -362,11 +362,66 @@ year?
 For this we can use the LanguageDesireNextYear column with similar 
 processing as the previous one.
 """  
-languages_interested_df = split_multicolumn(survey_df.LanguageDesireNextYear) 
+""" languages_interested_df = split_multicolumn(survey_df.LanguageDesireNextYear) 
 languages_interested_percentages = languages_interested_df.mean().sort_values(ascending=False)
 plt.figure(figsize=(12, 12)) 
 sns.barplot(x=languages_interested_percentages, y=languages_interested_percentages.index)
 plt.title("Langues people are interested in learning over the next year.") 
-plt.xlabel("Count")  
+plt.xlabel("Count")   """
+ 
+
+"""Q: Which are the most loved languages i.e a high percentage of people 
+who have used the language want to continue learning & using it over the next 
+year. 
+
+While this question may seem tricky, it's really easy to olve using Pandas array 
+operations. Here's what we can do: 
+
+1. Create a new dta frame languages_loved which contains a True value for 
+a langauge only if the corresponding values in languages_worked_df amd 
+languages_interested_df are both True.  
+2. Take the column wise sum of languages_loved_df and divide it by the 
+column-wise sum of languages_worked_df to get the percentage of respondents 
+who "love: the language
+""" 
+""" languages_loved_df = languages_worked_df & languages_interested_df   
+languages_loved_percentages = (languages_loved_df.sum() * 100 / languages_worked_df.sum()).sort_values(ascending=False)
+plt.figure(figsize=(12, 12)) 
+sns.barplot(x=languages_loved_percentages, y=languages_loved_percentages.index)
+plt.title("Most loved languages.") 
+plt.xlabel("Count")   
+ """
+""" 
+Q: In which countries do developers work the highest number of hours per 
+week? consider countries with more than 250 responses only. 
+
+T answer this question, we'll need to use the groupbyh data frame method 
+to aggregate the rows for each country. Well also need to filter the results to 
+include only the countries which have more than 250 respondents. 
+
+"""
+countries_df = survey_df.groupby("Country")[["WorkWeekHrs"]].mean().sort_values("WorkWeekHrs", ascending=False) 
+high_response_countries_df = countries_df.loc[survey_df.Country.value_counts() > 250].head(15) 
+print(high_response_countries_df)
+
+"""Q: How important is it to start young to build a career in programming? 
+
+Let's create a scatter plot of Age vs YearsCodePro (i.e years of coding experience) 
+to answer this question 
+""" 
+sns.scatterplot(x="Age", y="YearsCodePro", hue="Hobbyist", data=survey_df)
+plt.xlabel("Age")
+plt.ylabel("Years of professional coding experience") 
+
+"""You can see points all over the graph, which seems to indicate that you 
+can start programming pofessionally at any age. Also, many people seem to hvae 
+been coding for several decades professionally also seem to enjoy it as a hobby.
+
+We can also view the distribution of Age1stCode column to see when the 
+respondents tried programming for the first time. 
+""" 
+plt.figure(figsize=(12, 12)) 
+plt.title(schema.Age1stCode) 
+sns.displot(survey_df.Age1stCode) 
 
 plt.show()
