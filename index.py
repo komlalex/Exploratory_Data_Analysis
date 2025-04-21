@@ -312,5 +312,61 @@ otherwise it is False.
 We ca now use the column-wise totals to identify the most common roles 
 """ 
 dev_type_totals = dev_type_df.sum().sort_values(ascending=False) 
-print(dev_type_totals)
+print(dev_type_totals) 
+
+"""As one might expect, the most common roles include "Developer"  
+in the name. 
+"""
+
+"""Asking and Answering Questions 
+""" 
+
+"""
+Q.Which were the most popular programming languages in 2020? 
+
+To answer this, we can use the LanguageWorkedWith column. Similar to DevType, 
+respondents were allowed to choose multiple options
+""" 
+print(survey_df.LanguageWorkedWith) 
+
+"""First, we'll split this column into a data frame containing a column each 
+of each language listed in the options. 
+""" 
+languages_worked_df = split_multicolumn(survey_df.LanguageWorkedWith) 
+
+
+"""it appears that a total of 25 languages were included among the options. 
+Let's aggregate them to identify the percentage of respondents who 
+selected each langauge
+"""
+languages_worked_percentages = languages_worked_df.mean().sort_values(ascending=False)  
+
+"""We can plot this information using a horizontl bar chart""" 
+plt.figure(figsize=(12, 12)) 
+sns.barplot(x=languages_worked_percentages, y=languages_worked_percentages.index)
+plt.title("Langues used in the past year") 
+plt.xlabel("Count") 
+
+"""Perhaps not surprisingly, JavaScript & HTML/CSS comes out on top 
+as web development is one of the most sought skills today and it's also 
+happens to be one of the easiest to get started with. SQL is necessary for working 
+with relational databases, so it's no surprise that most programmers work with 
+SQL on a regular basis. For other forms of development, Python seems to be the 
+popular choice, beting out Java, which was the industry standard for server 
+and application development for over 2 decades.
+""" 
+
+"""Which languages are most people interested to learn over the next 
+year? 
+
+For this we can use the LanguageDesireNextYear column with similar 
+processing as the previous one.
+"""  
+languages_interested_df = split_multicolumn(survey_df.LanguageDesireNextYear) 
+languages_interested_percentages = languages_interested_df.mean().sort_values(ascending=False)
+plt.figure(figsize=(12, 12)) 
+sns.barplot(x=languages_interested_percentages, y=languages_interested_percentages.index)
+plt.title("Langues people are interested in learning over the next year.") 
+plt.xlabel("Count")  
+
 plt.show()
