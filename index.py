@@ -163,7 +163,6 @@ matplotlib.rcParams["figure.facecolor"] = "#00000000"
 Let's look at the number of countries from which there are responses in the survey, 
 and plot the 10 countries with the highest number of responses.  
 """  
-print(schema.Country)
 res = survey_df.Country.nunique()
 
 """We can identify the countries with the highest number of respondents 
@@ -189,7 +188,6 @@ in US, India and UK.
 The distribution of the age of respondents is another important factor to look
 at, and we can use a histogram to visualize it.
 """  
-print(schema)
 plt.figure(figsize=(12, 6)) 
 plt.title(schema.Age) 
 plt.xlabel("Age")
@@ -208,8 +206,8 @@ Let's look at the Distribution of responses for the Gender. It's a well
 known fact that women and non-binary genders are underrepresented in the 
 programming community, so we might expect to see a skewed distribution here. 
 """ 
-print(schema.Gender) 
-gender_counts = survey_df.Gender.value_counts(dropna=False) 
+gender_counts = survey_df.Gender.value_counts()  
+#gender_counts = survey_df.Gender.value_counts(dropna=False) 
 
 """
 A pie chart would be a good way to visualize the distribution 
@@ -218,5 +216,36 @@ plt.figure(figsize=(12, 6))
 plt.title(schema.Gender)
 plt.pie(gender_counts, labels=gender_counts.index, autopct="%1.1f%%") 
 
+"""Only about 8% of survey respondents who have answered the question 
+identify as women or non=binary. The number is lower than the overall 
+percentage of women & binary gender in the programming community - which is 
+estimated to to be around 12%  
+"""
+
+"""Education Level  
+Formal education in computer science is oftne considered an important requirement 
+of becoming a programmer. Let's see if this is indeed the cases, especially since 
+there are many free resources & tutorials online to learn programming. We'll 
+use a horizontal bar plot to compare education levels of respondents. 
+""" 
+plt.figure(figsize=(12, 6))
+sns.countplot(y=survey_df.EdLevel) 
+plt.xticks(rotation=75)
+plt.title(schema["EdLevel"]) 
+plt.ylabel(None) 
+
+"""It appears that well over half of the respondents hold a bachelor's  
+or master's degree, so most programmers definitely seem to have some college
+education, although it's not clear from this graph alone if they hold a 
+degree in computer science. 
+"""
+
+""""Let's also plot undergraduate majors, but this time, we'll 
+convert the numbers into percentages and sort by precentage valaues to make it 
+easier to visualize the order. 
+""" 
+plt.figure(figsize=(12, 6))
+undergrad_pct = survey_df.UndergradMajor.value_counts()  * 100 / survey_df.UndergradMajor.count() 
+sns.barplot(x = undergrad_pct, y=undergrad_pct.index) 
 
 plt.show()
