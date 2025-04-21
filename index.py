@@ -171,10 +171,10 @@ using the values_counts method.
 top_countries = survey_df.Country.value_counts().head(15) 
 
 """We can visualize this information using a bar chart"""
-plt.figure(figsize=(12, 6)) 
+""" plt.figure(figsize=(12, 6)) 
 plt.xticks(rotation=75) 
 plt.title(schema.Country) 
-sns.barplot(x=top_countries.index, y=top_countries) 
+sns.barplot(x=top_countries.index, y=top_countries)  """
 
 """
 It appears that a disproportionately high number of respondents are from USA & India - 
@@ -188,11 +188,11 @@ in US, India and UK.
 The distribution of the age of respondents is another important factor to look
 at, and we can use a histogram to visualize it.
 """  
-plt.figure(figsize=(12, 6)) 
+""" plt.figure(figsize=(12, 6)) 
 plt.title(schema.Age) 
 plt.xlabel("Age")
 plt.ylabel("Number of respondents") 
-plt.hist(survey_df.Age, bins=np.arange(10, 80, 5), color="purple") 
+plt.hist(survey_df.Age, bins=np.arange(10, 80, 5), color="purple") """ 
 
 """
 It appears that a large percentage of respondents are in the age range 
@@ -212,9 +212,9 @@ gender_counts = survey_df.Gender.value_counts()
 """
 A pie chart would be a good way to visualize the distribution 
 """ 
-plt.figure(figsize=(12, 6)) 
+""" plt.figure(figsize=(12, 6)) 
 plt.title(schema.Gender)
-plt.pie(gender_counts, labels=gender_counts.index, autopct="%1.1f%%") 
+plt.pie(gender_counts, labels=gender_counts.index, autopct="%1.1f%%")  """
 
 """Only about 8% of survey respondents who have answered the question 
 identify as women or non=binary. The number is lower than the overall 
@@ -228,11 +228,11 @@ of becoming a programmer. Let's see if this is indeed the cases, especially sinc
 there are many free resources & tutorials online to learn programming. We'll 
 use a horizontal bar plot to compare education levels of respondents. 
 """ 
-plt.figure(figsize=(12, 6))
+""" plt.figure(figsize=(12, 6))
 sns.countplot(y=survey_df.EdLevel) 
 plt.xticks(rotation=75)
 plt.title(schema["EdLevel"]) 
-plt.ylabel(None) 
+plt.ylabel(None)  """
 
 """It appears that well over half of the respondents hold a bachelor's  
 or master's degree, so most programmers definitely seem to have some college
@@ -240,12 +240,77 @@ education, although it's not clear from this graph alone if they hold a
 degree in computer science. 
 """
 
-""""Let's also plot undergraduate majors, but this time, we'll 
+""""
+Undergraduate Major
+Let's also plot undergraduate majors, but this time, we'll 
 convert the numbers into percentages and sort by precentage valaues to make it 
 easier to visualize the order. 
 """ 
-plt.figure(figsize=(12, 6))
+""" plt.figure(figsize=(12, 6))
 undergrad_pct = survey_df.UndergradMajor.value_counts()  * 100 / survey_df.UndergradMajor.count() 
 sns.barplot(x = undergrad_pct, y=undergrad_pct.index) 
+plt.ylabel(None) 
+plt.xlabel("Percentage") """
 
+"""
+It turns out 40% of programmers holding a college degree have a field of study 
+other than computer sciene - which is very encouraging. This seems to suggest that 
+what while college education is helpful in general, you do not need to pursue 
+a major in computer science to become a successful programmer. 
+""" 
+
+
+"""Employment
+Freelancing or contract work is a common choice among programmers, so 
+it would be interesting to compare the breakdown between full-time, 
+part-time and freelance work. Let's visualize the data from Employment 
+column"""
+""" plt.figure(figsize=(12, 9)) 
+(survey_df.Employment.value_counts(normalize=True, ascending=True) * 100).plot(kind="barh", color="g") 
+plt.title(schema.Employment) 
+plt.xlabel("Percentage")  """
+
+"""It appears that close to 10% of respondents are employed part time 
+or as freelancers. 
+"""
+
+"""The DevTtype field contains information about the roles held by 
+respondents. Since it allows multiple answers, the column contains lists 
+of values seperated by ";", which makes it a bit harder to analyze directly. 
+"""
+print(schema.DevType) 
+print(survey_df.DevType.value_counts()) 
+
+"""
+Let's define a helper function which turns a column containing lists of values 
+(like survey_df.fevType) into a data frame with one column for each possible 
+option""" 
+
+def split_multicolumn(col_series: pd.Series): 
+    result_df = col_series.to_frame()  
+    options = [] 
+
+    # Iterate over the column 
+
+    for idx, value in col_series[col_series.notnull()].items(): 
+        # Breake each value into list of options 
+        for option in value.split(";"): 
+            # Add the option as a column to result 
+            if not option in result_df.columns:
+                options.append(option) 
+                result_df[option] = False  
+            # Mark the value in the option columns as True 
+            result_df.at[idx, option] = True  
+    return result_df[options] 
+
+dev_type_df = split_multicolumn(survey_df.DevType) 
+
+"""The dev_type_df has one column for each option that can be selected as 
+a response. if a selected respondent has the option in the column it is True 
+otherwise it is False. 
+
+We ca now use the column-wise totals to identify the most common roles 
+""" 
+dev_type_totals = dev_type_df.sum().sort_values(ascending=False) 
+print(dev_type_totals)
 plt.show()
